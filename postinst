@@ -1,0 +1,103 @@
+#!/bin/zsh
+umask 022
+export preset=`cat /root/.zshrc.local|grep export\ preset|sed "s|export preset=||g"`
+echo nameserver 1.1.1.1 > /etc/resolv.conf
+echo > /etc/fstab
+while true;do
+if [ -e /etc/pacman.d/gnupg ];then
+sleep .01
+else
+pacman-key --init
+pacman-key --populate
+fi
+if pacman --needed --noconfirm --overwrite \* -Syu cros-container-guest-tools-git;then
+break
+else
+continue
+fi
+done
+mkdir -p ~/.config/systemd/user
+systemctl --user enable cros-garcon.service sommelier@0.service sommelier-x@0.service sommelier@1.service sommelier-x@1.service orca.service
+cp -rf ~/.config/systemd /etc/skel/.config
+mkdir -p /etc/skel/.local/share/applications
+base64 -d > /etc/skel/.local/share/applications/desktop.desktop<<EOF
+W0Rlc2t0b3AgRW50cnldClR5cGU9QXBwbGljYXRpb24KTmFtZT1EZXNrdG9wIFNlc3Npb24KRXhl
+Yz1zaCAtYyAifi8ueGluaXRyYyIK
+EOF
+base64 -d > /etc/skel/.local/share/applications/start-orca.desktop<<EOF
+W0Rlc2t0b3AgRW50cnldClR5cGU9QXBwbGljYXRpb24KTmFtZT1TdGFydCBPcmNhIFNjcmVlbiBS
+ZWFkZXIKRXhlYz1zaCAtYyAic3lzdGVtY3RsIC0tbm8tYmxvY2sgLS11c2VyIHN0YXJ0IG9yY2Ei
+Cg==
+EOF
+base64 -d > /etc/skel/.local/share/applications/stop-orca.desktop<<EOF
+W0Rlc2t0b3AgRW50cnldClR5cGU9QXBwbGljYXRpb24KTmFtZT1TdG9wIE9yY2EgU2NyZWVuIFJl
+YWRlcgpFeGVjPXNoIC1jICJzeXN0ZW1jdGwgLS1uby1ibG9jayAtLXVzZXIgc3RvcCBvcmNhIgo=
+EOF
+base64 -d > /etc/skel/.local/share/applications/restart-orca.desktop<<EOF
+W0Rlc2t0b3AgRW50cnldClR5cGU9QXBwbGljYXRpb24KTmFtZT1SZXN0YXJ0IE9yY2EgU2NyZWVu
+IFJlYWRlcgpFeGVjPXNoIC1jICJzeXN0ZW1jdGwgLS1uby1ibG9jayAtLXVzZXIgcmVzdGFydCBv
+cmNhIgo=
+EOF
+base64 -d > /etc/skel/.local/share/applications/enable-orca.desktop<<EOF
+W0Rlc2t0b3AgRW50cnldClR5cGU9QXBwbGljYXRpb24KTmFtZT1FbmFibGUgT3JjYSBTY3JlZW4g
+UmVhZGVyCkV4ZWM9c2ggLWMgInN5c3RlbWN0bCAtLW5vLWJsb2NrIC0tbm93IC0tdXNlciBlbmFi
+bGUgb3JjYSIK
+EOF
+base64 -d > /etc/skel/.local/share/applications/disable-orca.desktop<<EOF
+W0Rlc2t0b3AgRW50cnldClR5cGU9QXBwbGljYXRpb24KTmFtZT1EaXNhYmxlIE9yY2EgU2NyZWVu
+IFJlYWRlcgpFeGVjPXNoIC1jICJzeXN0ZW1jdGwgLS1uby1ibG9jayAtLW5vdyAtLXVzZXIgZGlz
+YWJsZSBvcmNhIgo=
+EOF
+chmod 755 /etc/skel/.local/share/applications
+chmod 644 /etc/skel/.local/share/applications/*.desktop
+echo export accessibility=1 >> /unattend
+echo export host=penguin >> /unattend
+echo export name=\"Chrome OS User\" >> /unattend
+echo export user=chronos >> /unattend
+echo export pass=facepunch >> /unattend
+echo export encrypthome=0 >> /unattend
+echo export autologin=0 >> /unattend
+cd
+echo GDK_BACKEND=x11 >> /etc/environment
+sed -i "s|\"Caps_Lock\",|\"Insert\",|g;s|\"Shift_Lock\"|\"KP_Insert\"|g" /etc/skel/.local/share/orca/user-settings.conf
+sed -i "/sudo speechctl/d;/logout/d;/spd-say/d;s|startx|sleep .01|g" /etc/skel/.zlogin
+sed -i /gnome_keyring/d /etc/pam.d/system-auth
+zsh -l
+usermod -u 1000 chronos
+groupmod -g 1000 chronos
+rm -rf /home/chronos /root/.config
+cp -rf /etc/skel /home/chronos
+chown -R chronos:chronos /home/chronos
+passwd -d chronos
+passwd -l chronos
+systemctl disable NetworkManager fenrirscreenreader speech-dispatcherd
+systemctl enable sshd dhclient@eth0
+cd /
+mkdir rootfs
+mount -o bind / rootfs
+mount /dev/disk/by-partlabel/EFI rootfs/boot/EFI
+mkdir templates
+base64 -d > templates/hostname.tpl<<EOF
+e3sgY29udGFpbmVyLm5hbWUgfX0K
+EOF
+base64 -d > templates/hosts.tpl<<EOF
+MTI3LjAuMS4xCXt7IGNvbnRhaW5lci5uYW1lIH19CjEyNy4wLjAuMQlsb2NhbGhvc3QKOjoxCQls
+b2NhbGhvc3QgaXA2LWxvY2FsaG9zdCBpcDYtbG9vcGJhY2sKZmYwMjo6MQkJaXA2LWFsbG5vZGVz
+CmZmMDI6OjIJCWlwNi1hbGxyb3V0ZXJzCgo=
+EOF
+base64 -d > metadata.yaml<<EOF
+YXJjaGl0ZWN0dXJlOiBhbWQ2NApjcmVhdGlvbl9kYXRlOiAxNjc5NjI4NTc0CnByb3BlcnRpZXM6
+CiAgYXJjaGl0ZWN0dXJlOiBhbWQ2NAogIGNyZWF0ZWRCeVRyZW1wbGluOiAidHJ1ZSIKICBkZXNj
+cmlwdGlvbjogRGViaWFuIGJ1bGxzZXllIGFtZDY0IChwcm9kKSAoMjAyMzAzMjRfMDM6MjkpCiAg
+bmFtZTogZGViaWFuLWJ1bGxzZXllLWFtZDY0LXByb2QtMjAyMzAzMjRfMDM6MjkKICBvczogZGVi
+aWFuCiAgcmVsZWFzZTogYnVsbHNleWUKICBzZXJpYWw6ICIyMDIzMDMyNF8wMzoyOSIKICB0cmVt
+cGxpblNldHVwRmluaXNoZWQ6ICJ0cnVlIgogIHZhcmlhbnQ6IHByb2QKdGVtcGxhdGVzOgogIC9l
+dGMvaG9zdG5hbWU6CiAgICB3aGVuOgogICAgLSBjcmVhdGUKICAgIC0gY29weQogICAgY3JlYXRl
+X29ubHk6IGZhbHNlCiAgICB0ZW1wbGF0ZTogaG9zdG5hbWUudHBsCiAgICBwcm9wZXJ0aWVzOiB7
+fQogIC9ldGMvaG9zdHM6CiAgICB3aGVuOgogICAgLSBjcmVhdGUKICAgIC0gY29weQogICAgY3Jl
+YXRlX29ubHk6IGZhbHNlCiAgICB0ZW1wbGF0ZTogaG9zdHMudHBsCiAgICBwcm9wZXJ0aWVzOiB7
+fQo=
+EOF
+tar --exclude rootfs/$preset".tini" -czf /$preset".tini" metadata.yaml rootfs templates
+umount rootfs/boot/EFI rootfs
+rm -rf /rootfs /metadata.yaml /templates

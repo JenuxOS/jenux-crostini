@@ -1,0 +1,60 @@
+name: x86_64-installer
+
+on:
+  push:
+    branches:
+      main
+  workflow_dispatch:
+  schedule:
+   - cron: 0 0 * * *
+
+jobs:
+  installer:
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64,aarch64]
+        preset: [live-basegui,live-gnome,live-mate,live-plasma]
+    
+    name: ${{ matrix.arch }}-${{ matrix.preset }}
+    runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    timeout-minutes: 120
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Create environment file
+        run: |
+          cat > .env << EOF
+          arch=${{ matrix.arch }}
+          preset=${{ matrix.preset }}
+          EOF
+          
+      - name: Create output directory
+        run: mkdir -p ./art
+      
+      - name: Build Docker image
+        run: docker build -t jenux -f dockerfile $PWD
+      
+      - name: Run Docker container
+        run: |
+          docker run --privileged --env-file .env \
+            -v $PWD/art:/build/out \
+            -t jenux
+      
+      - name: Upload output
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ${{ matrix.preset }}.tini
+          path: ./art/*.tini
+          compression-level: 9
+          if-no-files-found: error
+          retention-days: 90
