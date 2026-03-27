@@ -33,7 +33,7 @@ jobs:
         run: |
           cat > .env << EOF
           arch=${{ matrix.arch }}
-          preset=mate
+          preset=live-mate
           EOF
           
       - name: Create output directory
