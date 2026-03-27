@@ -1,4 +1,4 @@
-name: crostini
+name: x86_64-plasma
 
 on:
   push:
@@ -14,10 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64,aarch64]
-        preset: [basegui,gnome,mate,plasma]
+        arch: [x86_64]
     
-    name: ${{ matrix.arch }}-${{ matrix.preset }}
+    name: crostini
     runs-on: ${{ matrix.arch == 'aarch64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     timeout-minutes: 120
     steps:
@@ -34,7 +33,7 @@ jobs:
         run: |
           cat > .env << EOF
           arch=${{ matrix.arch }}
-          preset=live-${{ matrix.preset }}
+          preset=plasma
           EOF
           
       - name: Create output directory
@@ -53,8 +52,7 @@ jobs:
         uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: ${{ matrix.arch }}-${{ matrix.preset }}.tini
           path: ./art/*.tini
-          compression-level: 9
+          archive: false
           if-no-files-found: error
           retention-days: 90
