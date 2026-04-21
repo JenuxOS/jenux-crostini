@@ -98,6 +98,10 @@ fQogIC9ldGMvaG9zdHM6CiAgICB3aGVuOgogICAgLSBjcmVhdGUKICAgIC0gY29weQogICAgY3Jl
 YXRlX29ubHk6IGZhbHNlCiAgICB0ZW1wbGF0ZTogaG9zdHMudHBsCiAgICBwcm9wZXJ0aWVzOiB7
 fQo=
 EOF
+rm -rf etc/systemd/system/getty@tty1.service.d usr/bin/firstboot
+cp etc/skel/.zshrc.local root
+chown -R root:root root
+mv lib/systemd/system/getty@.service.sys lib/systemd/system/getty@.service
 tar --exclude rootfs/$preset".tini" -czf /$preset".tini" metadata.yaml rootfs templates
 umount rootfs/boot/EFI rootfs
 rm -rf /rootfs /metadata.yaml /templates
