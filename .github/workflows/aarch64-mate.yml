@@ -1,5 +1,8 @@
 name: aarch64-mate
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:

@@ -1,5 +1,8 @@
 name: aarch64-plasma
 
+permissions:
+  contents: read
+
 on:
   push:
     branches:
