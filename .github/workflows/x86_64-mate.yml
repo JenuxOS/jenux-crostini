@@ -1,8 +1,4 @@
 name: x86_64-mate
-
-permissions:
-  contents: read
-
 on:
   push:
     branches:
@@ -14,6 +10,9 @@ on:
 jobs:
   crostini:
     
+    permissions:
+      contents: read
+
     strategy:
       fail-fast: false
       matrix:

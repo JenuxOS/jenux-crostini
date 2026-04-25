@@ -1,8 +1,4 @@
 name: aarch64-gnome
-
-permissions:
-  contents: read
-
 on:
   push:
     branches:
@@ -13,7 +9,9 @@ on:
 
 jobs:
   crostini:
-    
+    permissions:
+      contents: read
+
     strategy:
       fail-fast: false
       matrix:

@@ -1,8 +1,4 @@
 name: aarch64-plasma
-
-permissions:
-  contents: read
-
 on:
   push:
     branches:
@@ -13,7 +9,10 @@ on:
 
 jobs:
   crostini:
-    
+ 
+    permissions:
+      contents: read
+   
     strategy:
       fail-fast: false
       matrix:
