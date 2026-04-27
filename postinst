@@ -70,8 +70,8 @@ cp -rf /etc/skel /home/chronos
 chown -R chronos:chronos /home/chronos
 passwd -d chronos
 passwd -l chronos
-systemctl disable NetworkManager fenrirscreenreader speech-dispatcherd
-systemctl enable sshd dhclient@eth0
+systemctl disable NetworkManager
+systemctl enable systemd-networkd
 cd /
 mkdir rootfs
 mount -o bind / rootfs
