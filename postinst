@@ -102,6 +102,6 @@ rm -rf etc/systemd/system/getty@tty1.service.d usr/bin/firstboot
 cp etc/skel/.zshrc.local root
 chown -R root:root root
 mv lib/systemd/system/getty@.service.sys lib/systemd/system/getty@.service
-tar --exclude rootfs/$preset".tini" -czf /$preset".tini" metadata.yaml rootfs templates
+tar --exclude rootfs/$preset".tini" --exclude rootfs/metadata.yaml -czf /$preset".tini" metadata.yaml rootfs templates
 umount rootfs/boot/EFI rootfs
 rm -rf /rootfs /metadata.yaml /templates

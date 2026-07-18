@@ -30,7 +30,7 @@ mkdir -p $mydir/$arch
 fi
 mount -o bind $mydir/$arch $mydir/$arch
 cd $mydir/$arch
-export url=`lynx --dump -listonly -nonumbers https://jenux.dev/ci|grep -w iso.zip|grep -w \`echo -en $arch|sed "s|aarch64|arm|g"\`-$preset|sed "s|jenux-$arch.iso|rootfs.tar|g"`
+export url="https://jenux.dev/get?"$arch"-"$preset".rootfs"
 while true;do
 if curl -L $url|bsdtar -xO|tar -x;then
 break
@@ -39,6 +39,7 @@ continue
 fi
 done
 cp $mydir/postinst .
+arch-chroot . /bin/rootfsprep
 arch-chroot . /postinst
 mv *.tini $mydir/out
 cd $mydir/out
