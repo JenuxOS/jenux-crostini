@@ -1,4 +1,5 @@
 #!/bin/sh
+umask 022
 if [ -z $arch ]||[ -z $preset ];then
 if [ -z $arch ];then
 echo arch is not set
