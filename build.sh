@@ -33,7 +33,7 @@ mount -o bind $mydir/$arch $mydir/$arch
 cd $mydir/$arch
 export url="https://jenux.dev/get?"$arch"-"$preset".rootfs"
 while true;do
-if curl -L $url|bsdunzip -p /dev/stdin|tar -x;then
+if curl -L $url|bsdunzip -p /dev/stdin rootfs.tar|tar -x;then
 break
 else
 continue
