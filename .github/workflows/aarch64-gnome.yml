@@ -55,7 +55,7 @@ jobs:
         if: always()
         with:
           name: ${{ matrix.preset }}.tini
-          path: ./art/*.tini
+          path: ./art/*.img.zst
           compression-level: 9
           if-no-files-found: error
           retention-days: 90

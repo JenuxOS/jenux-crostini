@@ -59,7 +59,6 @@ echo export encrypthome=0 >> /unattend
 echo export autologin=0 >> /unattend
 cd
 echo GDK_BACKEND=x11 >> /etc/environment
-sed -i "s|\"Caps_Lock\",|\"Insert\",|g;s|\"Shift_Lock\"|\"KP_Insert\"|g" /etc/skel/.local/share/orca/user-settings.conf
 sed -i "/sudo speechctl/d;/logout/d;/spd-say/d;s|startx|sleep .01|g" /etc/skel/.zlogin
 sed -i /gnome_keyring/d /etc/pam.d/system-auth
 zsh -l
@@ -72,36 +71,7 @@ passwd -d chronos
 passwd -l chronos
 systemctl disable NetworkManager
 systemctl enable systemd-networkd
-cd /
-mkdir rootfs
-mount -o bind / rootfs
-mount /dev/disk/by-partlabel/EFI rootfs/boot/EFI
-mkdir templates
-base64 -d > templates/hostname.tpl<<EOF
-e3sgY29udGFpbmVyLm5hbWUgfX0K
-EOF
-base64 -d > templates/hosts.tpl<<EOF
-MTI3LjAuMS4xCXt7IGNvbnRhaW5lci5uYW1lIH19CjEyNy4wLjAuMQlsb2NhbGhvc3QKOjoxCQls
-b2NhbGhvc3QgaXA2LWxvY2FsaG9zdCBpcDYtbG9vcGJhY2sKZmYwMjo6MQkJaXA2LWFsbG5vZGVz
-CmZmMDI6OjIJCWlwNi1hbGxyb3V0ZXJzCgo=
-EOF
-base64 -d > metadata.yaml<<EOF
-YXJjaGl0ZWN0dXJlOiBhbWQ2NApjcmVhdGlvbl9kYXRlOiAxNjc5NjI4NTc0CnByb3BlcnRpZXM6
-CiAgYXJjaGl0ZWN0dXJlOiBhbWQ2NAogIGNyZWF0ZWRCeVRyZW1wbGluOiAidHJ1ZSIKICBkZXNj
-cmlwdGlvbjogRGViaWFuIGJ1bGxzZXllIGFtZDY0IChwcm9kKSAoMjAyMzAzMjRfMDM6MjkpCiAg
-bmFtZTogZGViaWFuLWJ1bGxzZXllLWFtZDY0LXByb2QtMjAyMzAzMjRfMDM6MjkKICBvczogZGVi
-aWFuCiAgcmVsZWFzZTogYnVsbHNleWUKICBzZXJpYWw6ICIyMDIzMDMyNF8wMzoyOSIKICB0cmVt
-cGxpblNldHVwRmluaXNoZWQ6ICJ0cnVlIgogIHZhcmlhbnQ6IHByb2QKdGVtcGxhdGVzOgogIC9l
-dGMvaG9zdG5hbWU6CiAgICB3aGVuOgogICAgLSBjcmVhdGUKICAgIC0gY29weQogICAgY3JlYXRl
-X29ubHk6IGZhbHNlCiAgICB0ZW1wbGF0ZTogaG9zdG5hbWUudHBsCiAgICBwcm9wZXJ0aWVzOiB7
-fQogIC9ldGMvaG9zdHM6CiAgICB3aGVuOgogICAgLSBjcmVhdGUKICAgIC0gY29weQogICAgY3Jl
-YXRlX29ubHk6IGZhbHNlCiAgICB0ZW1wbGF0ZTogaG9zdHMudHBsCiAgICBwcm9wZXJ0aWVzOiB7
-fQo=
-EOF
 rm -rf etc/systemd/system/getty@tty1.service.d usr/bin/firstboot
 cp etc/skel/.zshrc.local root
 chown -R root:root root
 mv lib/systemd/system/getty@.service.sys lib/systemd/system/getty@.service
-tar --exclude rootfs/$preset".tini" --exclude rootfs/metadata.yaml -czf /$preset".tini" metadata.yaml rootfs templates
-umount rootfs/boot/EFI rootfs
-rm -rf /rootfs /metadata.yaml /templates

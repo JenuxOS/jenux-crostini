@@ -29,7 +29,9 @@ sleep .01
 else
 mkdir -p $mydir/$arch
 fi
-mount -o bind $mydir/$arch $mydir/$arch
+truncate -s 20G $arch"-"$preset".img"
+mkfs.btrfs $arch"-"$preset".img"
+mount $arch"-"$preset".img" $mydir/$arch
 cd $mydir/$arch
 export url="https://jenux.dev/get?"$arch"-"$preset".rootfs"
 while true;do
@@ -42,7 +44,7 @@ done
 cp $mydir/postinst .
 arch-chroot . /bin/rootfsprep
 arch-chroot . /postinst
-mv *.tini $mydir/out
-cd $mydir/out
+cd $mydir
+cat $arch"-"$preset".img"|zstd -3 > $mydir/out/$arch"-"$preset".img".zst
 umount $mydir/$arch
-rm -rf $mydir/$arch
+rm -rf $mydir/$arch $arch"-"$preset".img"
