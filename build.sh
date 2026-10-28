@@ -41,10 +41,12 @@ else
 continue
 fi
 done
-cp $mydir/postinst .
-arch-chroot . /bin/rootfsprep
-arch-chroot . /postinst
+cp $mydir/postinst $mydir/$arch
+chmod 755 $mydir/$arch/postinst
+arch-chroot $mydir/$arch /bin/sh /postinst
+rm $mydir/$arch/postinst
 cd $mydir
-cat $arch"-"$preset".img"|zstd -3 > $mydir/out/$arch"-"$preset".img".zst
 umount $mydir/$arch
-rm -rf $mydir/$arch $arch"-"$preset".img"
+rm -rf $mydir/$arch
+cat $arch"-"$preset".img"|zstd -3 > $mydir/out/$arch"-"$preset".img".zst
+rm $arch"-"$preset".img"

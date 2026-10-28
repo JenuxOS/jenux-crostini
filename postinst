@@ -1,4 +1,5 @@
 #!/bin/zsh
+rootfsprep
 umask 022
 export preset=`cat /root/.zshrc.local|grep export\ preset|sed "s|export preset=||g"`
 echo nameserver 1.1.1.1 > /etc/resolv.conf
@@ -71,7 +72,7 @@ passwd -d chronos
 passwd -l chronos
 systemctl disable NetworkManager
 systemctl enable systemd-networkd
-rm -rf etc/systemd/system/getty@tty1.service.d usr/bin/firstboot
 cp etc/skel/.zshrc.local root
 chown -R root:root root
-mv lib/systemd/system/getty@.service.sys lib/systemd/system/getty@.service
+mv /lib/systemd/system/getty@.service.sys /lib/systemd/system/getty@.service
+rm -rf /etc/systemd/system/getty@tty1.service.d /usr/bin/firstboot /usr/bin/rootfsprep
