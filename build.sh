@@ -33,7 +33,7 @@ truncate -s 20G $arch"-"$preset".img"
 mkfs.btrfs $arch"-"$preset".img"
 mount $arch"-"$preset".img" $mydir/$arch/$preset
 cd $mydir/$arch/$preset
-export url="https://jenux.dev/get?"$arch"-"$preset".rootfs"
+export url="https://jenux.dev/get?"$arch"-live-"$preset".rootfs"
 while true;do
 if curl -L $url|bsdunzip -I UTF-8 -O UTF-8 -p /dev/stdin rootfs.tar|tar -x;then
 break
