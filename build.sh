@@ -24,29 +24,29 @@ sleep .01
 else
 mkdir -p $mydir/out
 fi
-if [ -e $mydir/$arch ];then
+if [ -e $mydir/$arch/$preset ];then
 sleep .01
 else
-mkdir -p $mydir/$arch
+mkdir -p $mydir/$arch/$preset
 fi
 truncate -s 20G $arch"-"$preset".img"
 mkfs.btrfs $arch"-"$preset".img"
-mount $arch"-"$preset".img" $mydir/$arch
-cd $mydir/$arch
+mount $arch"-"$preset".img" $mydir/$arch/$preset
+cd $mydir/$arch/$preset
 export url="https://jenux.dev/get?"$arch"-"$preset".rootfs"
 while true;do
-if curl -L $url|bsdunzip -p /dev/stdin rootfs.tar|tar -x;then
+if curl -L $url|bsdunzip -I UTF-8 -O UTF-8 -p /dev/stdin rootfs.tar|tar -x;then
 break
 else
 continue
 fi
 done
-cp $mydir/postinst $mydir/$arch
-chmod 755 $mydir/$arch/postinst
-arch-chroot $mydir/$arch /bin/sh /postinst
-rm $mydir/$arch/postinst
+cp $mydir/postinst $mydir/$arch/$preset
+chmod 755 $mydir/$arch/$preset/postinst
+arch-chroot $mydir/$arch/$preset /bin/sh /postinst
+rm $mydir/$arch/$preset/postinst
 cd $mydir
-umount $mydir/$arch
-rm -rf $mydir/$arch
+umount $mydir/$arch/$preset
+rm -rf $mydir/$arch/$preset
 cat $arch"-"$preset".img"|zstd -3 > $mydir/out/$arch"-"$preset".img".zst
 rm $arch"-"$preset".img"
