@@ -17,6 +17,24 @@ fi
 if echo $arch|grep -qw _detect_;then
 export arch=`uname -m`
 fi
+if [ -e /.dockerenv ];then
+mount -t proc /proc /proc
+mount -t devtmpfs /dev /dev
+mount -t sysfs /sys /sys
+if [ -e /proc/sys/fs/binfmt_misc/ ];then
+sleep .01
+else
+mkdir -p /proc/sys/fs/binfmt_misc/
+fi
+if mountpoint -q /proc/sys/fs/binfmt_misc/;then
+sleep .01
+else
+mount -t binfmt_misc /proc/sys/fs/binfmt_misc/ /proc/sys/fs/binfmt_misc/
+fi
+for f in `ls /lib/binfmt.d/*`;do
+/lib/systemd/systemd-binfmt  $f
+done
+fi
 export mydir=$PWD
 cd $mydir
 if [ -e $mydir/out ];then
